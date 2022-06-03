@@ -18,7 +18,7 @@ dotenv.config();
     cd_perfil: number;
     ie_status: boolean;
 */
-export const Registro_user = async(req: Request, res: Response)=>{
+export async function Registro_user(req: Request, res: Response) {
     let cd_usuario: string = req.body.cd_usuario;
     let ds_email: string = req.body.ds_email;
     let ds_senha: string = req.body.ds_senha;
