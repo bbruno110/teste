@@ -7,14 +7,53 @@ import * as NutrienteController from "../controllers/Nutriente_Controller";
 import * as Ingredientes_Controller from "../controllers/Ingredientes_Controller";
 import * as Receita_controller from "../controllers/Receita";
 import * as uservalidator from '../Validator/Cadastro_user'
-import * as ingvalidator from '../Validator/Ingrediente_Validator'
+import * as ingvalidator from '../Validator/Ingrediente_Validator';
+import bcrypt from 'bcrypt';
+import { cpf , cnpj} from 'cpf-cnpj-validator';
+import {CadastroUser} from '../models/Usuarios';
+import {Pessoa_Fisica} from '../models/PF';
+import {Pessoa_Juridica} from '../models/PJ';
+import { validationResult } from 'express-validator';
 
 
 
 const router = Router();
 
 router.get('/', (req:Request, res:Response) => {return res.json({ message: 'backend works!' })});
-router.post("/login", cadUserController.Login);
+router.post("/login", 
+async(req:Request, res:Response)=>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.json({ error: errors.mapped() });
+        return;
+    };
+    let ds_email: string = req.body.ds_email;
+    let ds_senha: string = req.body.ds_senha;
+    let user = await CadastroUser.findOne({where:{ds_email}});
+    if(!user)
+    {
+        res.json({ error: "E-mail e/ou senhas errados!" });
+        return;
+    }
+    const match = await bcrypt.compare(ds_senha, user?.ds_senha as string)
+    if(!match)
+    {
+        res.json({ error: "E-mail e/ou senhas errados!" });
+        return;
+    }
+    let cd = await CadastroUser.findByPk(user?.cd_usuario)
+    if(cd)
+    {
+    const playload = (Date.now() + Math.random()).toString();
+    const token = await bcrypt.hashSync(playload,10);
+    cd.cd_token = token
+    await cd.save();
+    res.json({cd})
+    }
+}
+
+
+);
 router.post("/cadastro/Pessoa",Autorizacao.private, pfcontroller.criarPessoa);
 router.post("/cadastro", uservalidator.usuario, cadUserController.Registro_user);
 router.post("/esqueci-senha", cadUserController.esqueci_senha);
