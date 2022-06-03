@@ -27,7 +27,7 @@ export async function Registro_user(req: Request, res: Response) {
     const cod_user = await View_usuario.findOne({where: {cd_usuario}})
     if(!cod_user)
     {
-        res.json({error: 'Pessoa não cadastrada!'})
+        res.json({error: 'Pessoa já cadastrada!'})
     }
     else{
         let email_user = await CadastroUser.findOne({where: {ds_email}})
@@ -45,7 +45,8 @@ export async function Registro_user(req: Request, res: Response) {
         }
     }
 }
-export const Login = async(req:Request, res:Response)=>{
+
+export async function Login(req:Request, res:Response){
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.json({ error: errors.mapped() });
