@@ -14,7 +14,7 @@ import * as ingvalidator from '../Validator/Ingrediente_Validator'
 const router = Router();
 
 router.get('/', (req:Request, res:Response) => {return res.json({ message: 'backend works!' })});
-router.post("/login", cadUserController.Login);
+router.post("/login", function login(){cadUserController.Login});
 router.post("/cadastro/Pessoa",Autorizacao.private, pfcontroller.criarPessoa);
 router.post("/cadastro", uservalidator.usuario, cadUserController.Registro_user);
 router.post("/esqueci-senha", cadUserController.esqueci_senha);
